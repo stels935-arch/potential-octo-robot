@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Цилиндр колен – все атрибуты</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            background: #0b0b1a;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            color: #eee;
+            margin: 0;
+        }
+        .game-container {
+            background: #1a1a2e;
+            border-radius: 30px;
+            padding: 25px 20px 20px;
+            box-shadow: 0 10px 40px #0f3460;
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            font-size: 26px;
+            letter-spacing: 2px;
+            color: #f5c842;
+            text-shadow: 0 0 20px #f5c84255;
+            margin: 0 0 6px;
+        }
+        .sub {
+            color: #aaa;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        .score-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .score {
+            background: #2a2a4a;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 17px;
+            font-weight: bold;
+        }
+        .score span {
+            color: #2ecc71;
+            font-size: 24px;
+        }
+        .btn-group button {
+            background: #e94560;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 40px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 0 #a02040;
+        }
+        .btn-group button:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        .grid-wrapper {
+            background: #0f0f22;
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: inset 0 0 30px #00000088;
+            overflow-x: auto;
+            margin-bottom: 12px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 70px repeat(12, 1fr);
+            gap: 4px;
+            min-width: 700px;
+        }
+        .header-cell {
+            background: #1a1a3a;
+            color: #f0e6d0;
+            font-weight: bold;
+            font-size: 11px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            text-align: center;
+            word-break: break-word;
+            line-height: 1.2;
+        }
+        .cell {
+            aspect-ratio: 1 / 1.2;
+            background: #2a2a4e;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 500;
+            text-align: center;
+            padding: 2px;
+            color: #eee;
+            transition: 0.15s;
+            cursor: pointer;
+            box-shadow: 0 1px 0 #0a0a1a;
+            word-break: break-word;
+            line-height: 1.2;
+        }
+        .cell.empty {
+            background: #1a1a2e;
+            box-shadow: inset 0 0 0 1px #3a3a5a;
+            cursor: default;
+        }
+        .cell.correct-col {
+            background: #1e7e34 !important;
+            border: 2px solid #2ecc71;
+            box-shadow: 0 0 20px #2ecc7166;
+        }
+        .row-label {
+            background: #1a1a3a;
+            color: #ccc;
+            font-size: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px;
+            border-radius: 4px;
+            text-align: center;
+            word-break: break-word;
+            line-height: 1.1;
+        }
+        .row-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin: 8px 0 4px;
+        }
+        .row-control {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #1a1a3e;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+        .row-control button {
+            background: #e94560;
+            border: none;
+            color: white;
+            font-size: 14px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            box-shadow: 0 3px 0 #a02040;
+            line-height: 1;
+        }
+        .row-control button:active {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+        .row-control span {
+            min-width: 20px;
+            text-align: center;
+            color: #f5c842;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            font-size: 12px;
+            color: #aaa;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            background: #1e7e34;
+            border: 1px solid #2ecc71;
+        }
+        .legend-color.empty-color {
+            background: #1a1a2e;
+            border: 1px solid #3a3a5a;
+        }
+        @media (max-width: 800px) {
+            .grid {
+                grid-template-columns: 50px repeat(12, 1fr);
+                min-width: 500px;
+                gap: 3px;
+            }
+            .cell {
+                font-size: 9px;
+                padding: 1px;
+            }
+            .header-cell {
+                font-size: 9px;
+                padding: 2px;
+            }
+            .row-label {
+                font-size: 8px;
+            }
+            .row-control {
+                font-size: 10px;
+                padding: 1px 6px;
+            }
+            .row-control button {
+                width: 22px;
+                height: 22px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <h1>✦ ЦИЛИНДР ВСЕХ АТРИБУТОВ ✦</h1>
+    <div class="sub">Собери каждое колено – все 14 соответствий</div>
+
+    <div class="score-area">
+        <div class="score">✅ Собрано: <span id="scoreDisplay">0</span> / 12</div>
+        <div class="btn-group">
+            <button onclick="shuffleGrid()">Перемешать</button>
+        </div>
+    </div>
+
+    <div class="grid-wrapper">
+        <div id="gridContainer" class="grid"></div>
+    </div>
+
+    <div class="row-controls" id="rowControls"></div>
+
+    <div class="legend">
+        <span class="legend-item"><span class="legend-color"></span> Правильная колонка</span>
+        <span class="legend-item"><span class="legend-color empty-color"></span> Пустая ячейка</span>
+        <span class="legend-item">🔹 Клик по соседней с пустой – переместить</span>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    //  ПОЛНЫЕ ДАННЫЕ (все 14 атрибутов для 12 колен)
+    //  Порядок колен: Йеhуда, Иссахар, Реувен, Нафтали, Шимон, Гад,
+    //  Йосеф, Леви, Биньямин, Дан, Ашер, Звулун
+    // ============================================================
+    const tribes = [
+        {
+            name: "Йеhуда",
+            праматерь: "Лея",
+            месяц: "Нисан",
+            буква: "ה (hей)",
+            гематрия: "5",
+            знак: "Овен",
+            орган: "Правая нога",
+            проявление: "Разговор",
+            действие: "Говорить",
+            цвет: "Голубой",
+            рисунок: "Лев",
+            камень: "Карбункул/гранат",
+            планета: "Марс",
+            псалом: "114 и 92",
+            сфира: "Малхут"
+        },
+        {
+            name: "Иссахар",
+            праматерь: "Лея",
+            месяц: "Ияр",
+            буква: "ו (вав)",
+            гематрия: "6",
+            знак: "Бык",
+            орган: "Правая почка",
+            проявление: "Мысли",
+            действие: "Думать",
+            цвет: "Черный",
+            рисунок: "Солнце и луна",
+            камень: "Сапфир",
+            планета: "Венера",
+            псалом: "95",
+            сфира: "Хохма"
+        },
+        {
+            name: "Реувен",
+            праматерь: "Лея",
+            месяц: "Сиван",
+            буква: "ז (зайн)",
+            гематрия: "7",
+            знак: "Близнецы",
+            орган: "Левая нога",
+            проявление: "Ходьба",
+            действие: "Смотреть",
+            цвет: "Красный",
+            рисунок: "Человек/мандрагоры",
+            камень: "Рубин",
+            планета: "Меркурий",
+            псалом: "107",
+            сфира: "Хесед"
+        },
+        {
+            name: "Нафтали",
+            праматерь: "Бильга",
+            месяц: "Тамуз",
+            буква: "ח (хет)",
+            гематрия: "8",
+            знак: "Рак",
+            орган: "Правая рука",
+            проявление: "Зрение",
+            действие: "Ходить",
+            цвет: "Фиолетовый",
+            рисунок: "Лань",
+            камень: "Аметист",
+            планета: "Луна",
+            псалом: "90",
+            сфира: "Нецах"
+        },
+        {
+            name: "Шимон",
+            праматерь: "Лея",
+            месяц: "Ав",
+            буква: "ט (тет)",
+            гематрия: "9",
+            знак: "Лев",
+            орган: "Левая почка",
+            проявление: "Слух",
+            действие: "слушать",
+            цвет: "Зеленый",
+            рисунок: "Город Шхем",
+            камень: "Топаз",
+            планета: "Солнце",
+            псалом: "137",
+            сфира: "Гвура"
+        },
+        {
+            name: "Гад",
+            праматерь: "Зильпа",
+            месяц: "Элул",
+            буква: "י (йуд)",
+            гематрия: "10",
+            знак: "Дева",
+            орган: "Левая рука",
+            проявление: "Дело, поступок",
+            действие: "Делать руками",
+            цвет: "Черный с белым",
+            рисунок: "Лагерь Израиля",
+            камень: "Агат",
+            планета: "Меркурий",
+            псалом: "94",
+            сфира: "hод"
+        },
+        {
+            name: "Йосеф",
+            праматерь: "Рахель",
+            месяц: "Тишрей",
+            буква: "ל (ламед)",
+            гематрия: "30",
+            знак: "Весы",
+            орган: "Желчный пузырь",
+            проявление: "Супружеские отношения",
+            действие: "Иметь отношения",
+            цвет: "Ярко черный",
+            рисунок: "Бык/антилопа, два принца",
+            камень: "Оникс",
+            планета: "Венера",
+            псалом: "27",
+            сфира: "Йесод"
+        },
+        {
+            name: "Леви",
+            праматерь: "Лея",
+            месяц: "Хешван",
+            буква: "נ (нун)",
+            гематрия: "50",
+            знак: "Скорпион",
+            орган: "Кишечник",
+            проявление: "Нюх",
+            действие: "Нюхать",
+            цвет: "Белый, черный и красный",
+            рисунок: "Урим и Тумим",
+            камень: "Изумруд",
+            планета: "Марс, Плутон",
+            псалом: "80",
+            сфира: "Даат"
+        },
+        {
+            name: "Биньямин",
+            праматерь: "Рахель",
+            месяц: "Кислев",
+            буква: "ס (самех)",
+            гематрия: "60",
+            знак: "Стрелец",
+            орган: "Желудок",
+            проявление: "Сон",
+            действие: "Спать",
+            цвет: "Смесь всех цветов",
+            рисунок: "Волк",
+            камень: "Яшма",
+            планета: "Юпитер",
+            псалом: "67 и 93",
+            сфира: "Тиферет"
+        },
+        {
+            name: "Дан",
+            праматерь: "Бильга",
+            месяц: "Тевет",
+            буква: "ע (айн)",
+            гематрия: "70",
+            знак: "Козерог",
+            орган: "Печень",
+            проявление: "Гнев",
+            действие: "Злиться",
+            цвет: "Черный, как тушь",
+            рисунок: "Орел/змея",
+            камень: "Опал",
+            планета: "Сатурн",
+            псалом: "59",
+            сфира: "Гвура"
+        },
+        {
+            name: "Ашер",
+            праматерь: "Зильпа",
+            месяц: "Шват",
+            буква: "צ (цади)",
+            гематрия: "90",
+            знак: "Водолей",
+            орган: "Пупок",
+            проявление: "Питание",
+            действие: "Есть",
+            цвет: "Светло-желтый",
+            рисунок: "Дерево олив",
+            камень: "Хризолит",
+            планета: "Сатурн, Уран",
+            псалом: "23",
+            сфира: "Бина"
+        },
+        {
+            name: "Звулун",
+            праматерь: "Лея",
+            месяц: "Адар",
+            буква: "ק (куф)",
+            гематрия: "100",
+            знак: "Рыбы",
+            орган: "Селезёнка",
+            проявление: "Смех",
+            действие: "Веселиться",
+            цвет: "Белый",
+            рисунок: "Корабль",
+            камень: "Алмаз",
+            планета: "Юпитер, Нептун",
+            псалом: "126",
+            сфира: "Кетер"
+        }
+    ];
+
+    // Список ключей атрибутов (все, кроме name) – их 14
+    const attrKeys = [
+        "праматерь", "месяц", "буква", "гематрия", "знак",
+        "орган", "проявление", "действие", "цвет", "рисунок",
+        "камень", "планета", "псалом", "сфира"
+    ];
+    const attrLabels = [
+        "Праматерь", "Месяц", "Буква", "Гематрия", "Знак",
+        "Орган", "Проявление", "Действие", "Цвет", "Рисунок",
+        "Камень", "Планета", "Псалом", "Сфира"
+    ];
+
+    const ROWS = attrKeys.length;   // 14
+    const COLS = tribes.length;     // 12
+
+    function getCorrectValues(colIndex) {
+        const t = tribes[colIndex];
+        return attrKeys.map(key => t[key]);
+    }
+
+    let grid = [];          // grid[row][col]
+    let emptyRow = -1, emptyCol = -1;
+
+    // ============================================================
+    //  ИНИЦИАЛИЗАЦИЯ / ПЕРЕМЕШИВАНИЕ
+    // ============================================================
+    function initGrid() {
+        let allValues = [];
+        for (let c = 0; c < COLS; c++) {
+            const correct = getCorrectValues(c);
+            allValues.push(...correct);
+        }
+        allValues.push(null); // пустая
+
+        // Перемешиваем
+        for (let i = allValues.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [allValues[i], allValues[j]] = [allValues[j], allValues[i]];
+        }
+
+        grid = [];
+        let idx = 0;
+        for (let r = 0; r < ROWS; r++) {
+            const row = [];
+            for (let c = 0; c < COLS; c++) {
+                const val = allValues[idx++];
+                row.push(val);
+                if (val === null) {
+                    emptyRow = r;
+                    emptyCol = c;
+                }
+            }
+            grid.push(row);
+        }
+        // На всякий случай
+        if (emptyRow === -1) {
+            grid[ROWS-1][COLS-1] = null;
+            emptyRow = ROWS-1;
+            emptyCol = COLS-1;
+        }
+    }
+
+    // ============================================================
+    //  ПРОВЕРКА КОЛОНКИ
+    // ============================================================
+    function isColumnCorrect(col) {
+        const correct = getCorrectValues(col);
+        for (let r = 0; r < ROWS; r++) {
+            if (grid[r][col] !== correct[r]) return false;
+        }
+        return true;
+    }
+
+    function countCorrectColumns() {
+        let count = 0;
+        for (let c = 0; c < COLS; c++) {
+            if (isColumnCorrect(c)) count++;
+        }
+        return count;
+    }
+
+    // ============================================================
+    //  ОТРИСОВКА
+    // ============================================================
+    function render() {
+        const container = document.getElementById('gridContainer');
+        container.innerHTML = '';
+
+        // Заголовки колонок (названия колен)
+        for (let c = -1; c < COLS; c++) {
+            const div = document.createElement('div');
+            div.className = 'header-cell';
+            if (c === -1) {
+                div.textContent = 'Колено';
+                div.style.background = '#2a2a4e';
+            } else {
+                div.textContent = tribes[c].name;
+            }
+            container.appendChild(div);
+        }
+
+        // Строки
+        for (let r = 0; r < ROWS; r++) {
+            // Лейбл атрибута
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'row-label';
+            labelDiv.textContent = attrLabels[r];
+            container.appendChild(labelDiv);
+
+            for (let c = 0; c < COLS; c++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                const val = grid[r][c];
+                if (val === null) {
+                    cell.classList.add('empty');
+                    cell.textContent = '';
+                } else {
+                    cell.textContent = val;
+                }
+                if (isColumnCorrect(c)) {
+                    cell.classList.add('correct-col');
+                }
+                cell.dataset.row = r;
+                cell.dataset.col = c;
+                cell.addEventListener('click', onCellClick);
+                container.appendChild(cell);
+            }
+        }
+        updateScore();
+        renderRowControls();
+    }
+
+    function updateScore() {
+        document.getElementById('scoreDisplay').textContent = countCorrectColumns();
+    }
+
+    // ============================================================
+    //  ПЕРЕМЕЩЕНИЕ (пятнашки)
+    // ============================================================
+    function onCellClick(e) {
+        const row = parseInt(e.currentTarget.dataset.row);
+        const col = parseInt(e.currentTarget.dataset.col);
+        if (Math.abs(row - emptyRow) + Math.abs(col - emptyCol) === 1) {
+            grid[emptyRow][emptyCol] = grid[row][col];
+            grid[row][col] = null;
+            emptyRow = row;
+            emptyCol = col;
+            render();
+            if (countCorrectColumns() === COLS) {
+                setTimeout(() => alert('🎉 Поздравляем! Все колена собраны!'), 100);
+            }
+        }
+    }
+
+    // ============================================================
+    //  ВРАЩЕНИЕ СТРОК (кубик Рубика)
+    // ============================================================
+    function rotateRow(row, direction) {
+        const rowData = grid[row];
+        if (direction === 1) {
+            const last = rowData.pop();
+            rowData.unshift(last);
+        } else {
+            const first = rowData.shift();
+            rowData.push(first);
+        }
+        // обновляем позицию пустой, если она в этой строке
+        if (emptyRow === row) {
+            emptyCol = rowData.indexOf(null);
+        }
+        render();
+        if (countCorrectColumns() === COLS) {
+            setTimeout(() => alert('🎉 Поздравляем! Все колена собраны!'), 100);
+        }
+    }
+
+    function renderRowControls() {
+        const container = document.getElementById('rowControls');
+        container.innerHTML = '';
+        for (let r = 0; r < ROWS; r++) {
+            const div = document.createElement('div');
+            div.className = 'row-control';
+            const label = document.createElement('span');
+            label.textContent = attrLabels[r].substring(0, 6);
+            div.appendChild(label);
+
+            const btnLeft = document.createElement('button');
+            btnLeft.textContent = '◄';
+            btnLeft.addEventListener('click', () => rotateRow(r, -1));
+            div.appendChild(btnLeft);
+
+            const posSpan = document.createElement('span');
+            posSpan.textContent = '↕';
+            div.appendChild(posSpan);
+
+            const btnRight = document.createElement('button');
+            btnRight.textContent = '►';
+            btnRight.addEventListener('click', () => rotateRow(r, 1));
+            div.appendChild(btnRight);
+
+            container.appendChild(div);
+        }
+    }
+
+    // ============================================================
+    //  ПЕРЕМЕШИВАНИЕ
+    // ============================================================
+    function shuffleGrid() {
+        initGrid();
+        render();
+    }
+
+    // ============================================================
+    //  СТАРТ
+    // ============================================================
+    initGrid();
+    render();
+</script>
+</body>
+</html>
